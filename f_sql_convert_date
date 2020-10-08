@@ -1,0 +1,14 @@
+-- readme for more information and clone both files to use or collaborate.
+
+create or replace function f_sql_convert_date (s varchar) returns date stable
+as $$
+select (case   when $1 ~ '^[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2}' then substring($1, 1, 10)                                         --Pattern Matches 6 date like variations
+               when $1 ~ '^[A-Za-z]{3} +[0-9]{1,2} *, *[0-9]{2,4}$' then $1                                                    --Pattern Matches 4 variations
+               when $1 ~ '^[0-9]{2}/[0-9]{2}/[0-9]{2,4}$' then substring($1, 4, 2)||'-'||substring($1, 1,2)||'-'||substring($1, 7) --Pattern Matches 2 variations
+               when $1 ~ '^[0-9]{1,2}-[0-9]{1,2}-[0-9]{2,4}$' then $1                                                            --Pattern Matches 6 variations
+               when $1 ~ '^[A-Za-z]{3} +[0-9]{1,2} * *[0-9]{2,4}$' then $1                                                      --Pattern Matches 4 variations
+               when $1 ~ '^[0-9]{4}.[0-9]{1,2}.[0-9]{1,2}$' then $1                                                             --Pattern Matches 4 variations
+            else null
+               end
+    )::date
+$$ language sql;
